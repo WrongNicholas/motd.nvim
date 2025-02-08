@@ -59,8 +59,7 @@ function M.open_homepage()
 
     -- Define a simple welcome message
     local welcome_message = {
-        "Should I kill myself, or have a cup of coffee?",
-        "But in the end one needs more courage to live than to kill himself.",
+        "One must imagine Sisyphus happy.",
         "-Albert Camus",
     }
 
