@@ -34,12 +34,12 @@ local function create_fullscreen_buffer(ascii_art, welcome_message)
     return padded_lines
 end
 
--- Function to open the custom homepage
 function M.open_homepage()
-    vim.cmd("enew")  -- Open a new empty buffer
+    vim.cmd("enew")
     vim.bo[0].buftype = "nofile"
-    vim.bo[0].bufhidden = "hide"
+    vim.bo[0].bufhidden = "wipe"
     vim.bo[0].swapfile = false
+    vim.bo[0].buflisted = false
 
     -- Define ASCII art
     local ascii_art = {
