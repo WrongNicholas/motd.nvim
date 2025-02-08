@@ -59,8 +59,9 @@ function M.open_homepage()
 
     -- Define a simple welcome message
     local welcome_message = {
-        "Welcome to Neovim, where code meets creativity.",
-        "Type :q to quit or :e <filename> to start coding.",
+        "Should I kill myself, or have a cup of coffee?",
+        "But in the end one needs more courage to live than to kill himself.",
+        "-Albert Camus",
     }
 
     -- Generate a fully padded screen with ASCII art and a welcome message
