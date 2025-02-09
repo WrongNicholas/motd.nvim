@@ -45,6 +45,15 @@ function M.show_motd()
 
     -- Set the buffer as the current window
     vim.api.nvim_set_current_buf(buf)
+    
+    vim.api.nvim_create_autocmd("WinEnter", {
+    callback = function()
+        local current_buf = vim.api.nvim_get_current_buf()
+        if current_buf ~= buf then
+            vim.api.nvim_buf_delete(buf, { force = true })
+        end
+    end
+    })
 
     end
 
