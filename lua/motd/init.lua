@@ -44,15 +44,14 @@ function M.show_motd()
     -- Set the buffer as the current window
     vim.api.nvim_set_current_buf(buf)
 
-    -- Auto-close the MOTD buffer when another file is opened
     vim.api.nvim_create_autocmd("BufEnter", {
         callback = function()
             if vim.api.nvim_get_current_buf() ~= buf then
-                vim.api.nvim_buf_delete(buf, { force = true })
+                vim.cmd("BufferClose " .. buf) -- Barbar's command to close the buffer
             end
         end,
     })
-end
+  end
 
 return M
 
