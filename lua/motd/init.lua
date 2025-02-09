@@ -45,6 +45,14 @@ function M.show_motd()
     vim.api.nvim_buf_set_option(buf, "bufhidden", "wipe") -- Close automatically
     vim.api.nvim_buf_set_option(buf, "buflisted", false)
 
+    -- Define a highlight group for blue text
+    vim.cmd("highlight MotdBlue guifg=#00aaff ctermfg=Blue")
+
+    -- Apply highlighting to each line
+    for i = 0, #motd_lines - 1 do
+        vim.api.nvim_buf_add_highlight(buf, -1, "MotdBlue", i, 0, -1)
+    end
+
     -- Set the buffer as the current window
     vim.api.nvim_set_current_buf(buf)
 
