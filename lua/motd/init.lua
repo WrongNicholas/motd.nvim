@@ -2,6 +2,7 @@ local M = {}
 
 -- Function to get plugin path dynamically
 local function get_plugin_path()
+    -- Get the path of the current script (i.e., init.lua)
     local path = debug.getinfo(1, "S").source:sub(2):match("(.*/lua/)")
     return path and path .. "motd/motd.txt" or nil
 end
@@ -39,17 +40,15 @@ function M.show_motd()
     vim.api.nvim_buf_set_option(buf, "modifiable", false) -- Read-only buffer
     vim.api.nvim_buf_set_option(buf, "buftype", "nofile") -- Prevent saving
     vim.api.nvim_buf_set_option(buf, "bufhidden", "wipe") -- Close automatically
-    vim.api.nvim_buf_set_option(buf, "buflisted", false) -- Do not list in Barbar
 
     -- Set the buffer as the current window
     vim.api.nvim_set_current_buf(buf)
 
-    -- Auto-close the MOTD buffer when another file is opened using Barbar
+    -- Auto-close the MOTD buffer when another file is opened
     vim.api.nvim_create_autocmd("BufEnter", {
         callback = function()
             if vim.api.nvim_get_current_buf() ~= buf then
-                -- Execute Barbar's BufferClose command properly
-                vim.cmd("silent! BufferClose!")
+                vim.api.nvim_buf_delete(buf, { force = true })
             end
         end,
     })
