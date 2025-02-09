@@ -40,6 +40,7 @@ function M.show_motd()
     vim.api.nvim_buf_set_option(buf, "modifiable", false) -- Read-only buffer
     vim.api.nvim_buf_set_option(buf, "buftype", "nofile") -- Prevent saving
     vim.api.nvim_buf_set_option(buf, "bufhidden", "wipe") -- Close automatically
+    vim.api.nvim_buf_set_option(buf, "buflisted", false) -- Do not list in Barbar
 
     -- Set the buffer as the current window
     vim.api.nvim_set_current_buf(buf)
