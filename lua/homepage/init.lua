@@ -1,34 +1,35 @@
 local M = {}
 
+-- Helper function to center text within a given width
+local function center_text(text, width)
+    local padding = math.floor((width - #text) / 2)
+    return string.rep(" ", math.max(0, padding)) .. text
+end
+
 -- Function to create a fully padded screen
 local function create_fullscreen_buffer(ascii_art, welcome_message)
-    local width = vim.api.nvim_win_get_width(0)   -- Get window width
-    local height = vim.api.nvim_win_get_height(0) -- Get window height
-
-    local total_content_height = #ascii_art + 2 + #welcome_message  -- Total height including ASCII and spacing
-    local pad_top = math.floor((height - total_content_height) / 2)  -- Calculate vertical centering
-
+    local width, height = vim.api.nvim_win_get_width(0), vim.api.nvim_win_get_height(0)
+    local total_content_height = #ascii_art + 2 + #welcome_message
+    local pad_top = math.floor((height - total_content_height) / 2)
     local padded_lines = {}
 
-    -- Fill the buffer with empty lines first (ensures line numbers extend fully)
+    -- Fill the buffer with empty lines
     for _ = 1, height do
         table.insert(padded_lines, "")
     end
 
-    -- Place ASCII art at the correct vertical position
+    -- Add ASCII art
     for i, line in ipairs(ascii_art) do
-        local padding = math.floor((width - #line) / 2)
-        padded_lines[pad_top + i] = string.rep(" ", math.max(0, padding)) .. line
+        padded_lines[pad_top + i] = center_text(line, width)
     end
 
-    -- Add spacing between ASCII and welcome message
+    -- Add spacing
     padded_lines[pad_top + #ascii_art + 1] = ""
     padded_lines[pad_top + #ascii_art + 2] = ""
 
-    -- Center the welcome message
+    -- Add welcome message
     for i, line in ipairs(welcome_message) do
-        local padding = math.floor((width - #line) / 2)
-        padded_lines[pad_top + #ascii_art + 2 + i] = string.rep(" ", math.max(0, padding)) .. line
+        padded_lines[pad_top + #ascii_art + 2 + i] = center_text(line, width)
     end
 
     return padded_lines
@@ -36,47 +37,39 @@ end
 
 function M.open_homepage()
     vim.cmd("enew")
-    vim.bo[0].buftype = "nofile"
-    vim.bo[0].bufhidden = "wipe"
-    vim.bo[0].swapfile = false
-    vim.bo[0].buflisted = false
+    local buf = vim.api.nvim_get_current_buf()
+    vim.bo[buf].buftype, vim.bo[buf].bufhidden, vim.bo[buf].swapfile, vim.bo[buf].buflisted = "nofile", "wipe", false, false
 
-    -- Define ASCII art
     local ascii_art = {
-"  _____                   _____            ____  ____ ",
-" |\\    \\   _____     ____|\\    \\          |    ||    |",
-" | |    | /    /|   /     /\\    \\         |    ||    |",
-" \\/     / |    ||  /     /  \\    \\        |    ||    |",
-" /     /_  \\   \\/ |     |    |    | ____  |    ||    |",
-"|     // \\  \\   \\ |     |    |    ||    | |    ||    |",
-"|    |/   \\ |    ||\\     \\  /    /||    | |    ||    |",
-"|\\ ___/\\   \\|   /|| \\_____\\/____/ ||\\____\\|____||____|",
-"| |   | \\______/ | \\ |    ||    | /| |    |    ||    |",
-" \\|___|/\\ |    | |  \\|____||____|/  \\|____|____||____|",
-"    \\(   \\|____|/      \\(    )/        \\(   )/    \\(  ",
-"     '      )/          '    '          '   '      '  ",
-"            '                                         ",
+        "  _____                   _____            ____  ____ ",
+        " |\\    \\   _____     ____|\\    \\          |    ||    |",
+        " | |    | /    /|   /     /\\    \\         |    ||    |",
+        " \\/     / |    ||  /     /  \\    \\        |    ||    |",
+        " /     /_  \\   \\/ |     |    |    | ____  |    ||    |",
+        "|     // \\  \\   \\ |     |    |    ||    | |    ||    |",
+        "|    |/   \\ |    ||\\     \\  /    /||    | |    ||    |",
+        "|\\ ___/\\   \\|   /|| \\_____\\/____/ ||\\____\\|____||____|",
+        "| |   | \\______/ | \\ |    ||    | /| |    |    ||    |",
+        " \\|___|/\\ |    | |  \\|____||____|/  \\|____|____||____|",
+        "    \\(   \\|____|/      \\(    )/        \\(   )/    \\(  ",
+        "     '      )/          '    '          '   '      '  ",
+        "            '                                         ",
     }
 
-    -- Define a simple welcome message
     local welcome_message = {
         "One must imagine Sisyphus happy.",
         "-Albert Camus",
     }
 
-    -- Generate a fully padded screen with ASCII art and a welcome message
     local padded_lines = create_fullscreen_buffer(ascii_art, welcome_message)
-
-    -- Set buffer content
-    vim.api.nvim_buf_set_lines(0, 0, -1, false, padded_lines)
+    vim.api.nvim_buf_set_lines(buf, 0, -1, false, padded_lines)
 end
 
--- Function to trigger on startup
 function M.setup()
     vim.api.nvim_create_autocmd("VimEnter", {
         pattern = "*",
         callback = function()
-            if vim.fn.argc() == 0 then  -- Only if no files were opened
+            if vim.fn.argc() == 0 then
                 M.open_homepage()
             end
         end
