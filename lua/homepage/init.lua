@@ -43,19 +43,19 @@ function M.open_homepage()
 
     -- Define ASCII art
     local ascii_art = {
-        "  _____                   _____            ____  ____ ",
-        " |\\    \\   _____     ____|\\    \\          |    ||    |",
-        " | |    | /    /|   /     /\\    \\         |    ||    |",
-        " \\/     / |    ||  /     /  \\    \\        |    ||    |",
-        " /     /_  \\   \\/ |     |    |    | ____  |    ||    |",
-        "|     // \\  \\   \\ |     |    |    ||    | |    ||    |",
-        "|    |/   \\ |    ||\\     \\  /    /||    | |    ||    |",
-        "|\\ ___/\\   \\|   /|| \\_____\\/____/ ||\\____\\|____||____|",
-        "| |   | \\______/ | \\ |    ||    | /| |    |    ||    |",
-        " \\|___|/\\ |    | |  \\|____||____|/  \\|____|____||____|",
-        "    \\(   \\|____|/      \\(    )/        \\(   )/    \\(  ",
-        "     '      )/          '    '          '   '      '  ",
-        "            '                                         ",
+"  _____                   _____            ____  ____ ",
+" |\\    \\   _____     ____|\\    \\          |    ||    |",
+" | |    | /    /|   /     /\\    \\         |    ||    |",
+" \\/     / |    ||  /     /  \\    \\        |    ||    |",
+" /     /_  \\   \\/ |     |    |    | ____  |    ||    |",
+"|     // \\  \\   \\ |     |    |    ||    | |    ||    |",
+"|    |/   \\ |    ||\\     \\  /    /||    | |    ||    |",
+"|\\ ___/\\   \\|   /|| \\_____\\/____/ ||\\____\\|____||____|",
+"| |   | \\______/ | \\ |    ||    | /| |    |    ||    |",
+" \\|___|/\\ |    | |  \\|____||____|/  \\|____|____||____|",
+"    \\(   \\|____|/      \\(    )/        \\(   )/    \\(  ",
+"     '      )/          '    '          '   '      '  ",
+"            '                                         ",
     }
 
     -- Define a simple welcome message
@@ -64,51 +64,34 @@ function M.open_homepage()
         "- Albert Camus",
     }
 
-    -- Get window dimensions
-    local width = vim.api.nvim_win_get_width(0)
-    local height = vim.api.nvim_win_get_height(0)
+    -- Generate a fully padded screen with ASCII art and a welcome message
+    local padded_lines = create_fullscreen_buffer(ascii_art, welcome_message)
 
-    -- Center ASCII art and text vertically
-    local total_content_height = #ascii_art + 2 + #welcome_message
-    local pad_top = math.floor((height - total_content_height) / 2)
+    -- Set buffer content
+    vim.api.nvim_buf_set_lines(0, 0, -1, false, padded_lines)
 
-    -- Set the ASCII art in the buffer
-    vim.api.nvim_buf_set_lines(0, 0, -1, false, {})
+    -- Get the current buffer
+    local buf = vim.api.nvim_get_current_buf()
 
-    local ns_id = vim.api.nvim_create_namespace("ascii_ns")
+    -- Define highlight groups (Run :highlight in Neovim to see available groups)
+    vim.cmd("highlight MyAsciiArt guifg=#00aaff")  -- Blue ASCII Art
+    vim.cmd("highlight MyHighlightWord guifg=#ff0000 gui=bold")  -- Red for "Sisyphus"
 
-    -- Define highlight groups
-    vim.api.nvim_set_hl(0, "AsciiBlue",  { fg = "#00AFFF", bold = true })   -- Bright Blue
-    vim.api.nvim_set_hl(0, "AsciiWhite", { fg = "#FFFFFF", bold = true })   -- Normal White
-
-    -- Center ASCII horizontally
-    for i, line in ipairs(ascii_art) do
-        local padding = math.floor((width - #line) / 2)
-        local padded_line = string.rep(" ", math.max(0, padding)) .. line
-        vim.api.nvim_buf_set_lines(0, i - 1, i, false, { padded_line })
-
-        -- Split ASCII horizontally (color left half blue, right half white)
-        local mid_col = math.floor(#padded_line / 2)
-
-        -- Apply blue highlight to the first half
-        vim.api.nvim_buf_add_highlight(0, ns_id, "AsciiBlue", i - 1, padding, padding + mid_col)
-
-        -- Apply white highlight to the second half
-        vim.api.nvim_buf_add_highlight(0, ns_id, "AsciiWhite", i - 1, padding + mid_col, padding + #padded_line)
+    -- Highlight ASCII Art
+    for i = 1, #ascii_art do
+        vim.api.nvim_buf_add_highlight(buf, 0, "MyAsciiArt", i - 1, 0, -1)
     end
 
-    -- Define a highlight group for "Sisyphus"
-    vim.api.nvim_set_hl(0, "SisyphusHighlight", { fg = "#FF5733", bold = true })
+    -- Find "Sisyphus" in the welcome message and highlight it
+    local message_index = #ascii_art + 2 + 1  -- Adjusted position for message
+    local message_line = padded_lines[message_index]
 
-    -- Center and highlight "Sisyphus" in the quote
-    local quote_line = pad_top + #ascii_art + 2
-    local quote_text = "One must imagine Sisyphus happy."
-    vim.api.nvim_buf_set_lines(0, quote_line, quote_line + 1, false, { quote_text, "- Albert Camus" })
-
-    -- Find "Sisyphus" and highlight it
-    local start_col, end_col = string.find(quote_text, "Sisyphus")
+    local start_col, end_col = message_line:find("Sisyphus")
     if start_col and end_col then
-        vim.api.nvim_buf_add_highlight(0, ns_id, "SisyphusHighlight", quote_line, start_col - 1, end_col)
+        vim.api.nvim_buf_set_extmark(buf, vim.api.nvim_create_namespace(""), message_index - 1, start_col - 1, {
+            end_col = end_col,
+            hl_group = "MyHighlightWord"
+        })
     end
 end
 
@@ -125,4 +108,3 @@ function M.setup()
 end
 
 return M
-
