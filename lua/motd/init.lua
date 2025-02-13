@@ -3,7 +3,7 @@ local M = {}
 -- Function to get the plugin directory
 local function get_plugin_path()
     local path = debug.getinfo(1, "S").source:sub(2):match("(.*/lua/)")
-    return path and path .. "resources/" or nil
+    return path and path .. "motd/resources/" or nil
 end
 
 -- Function to read ASCII art from ascii.txt
