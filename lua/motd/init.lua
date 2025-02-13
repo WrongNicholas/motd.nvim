@@ -7,6 +7,7 @@ local function get_plugin_path()
 end
 
 -- Function to read ASCII art from ascii.txt
+-- Function to read ASCII art from ascii.txt
 local function read_ascii()
     local file_path = get_plugin_path() .. "ascii.txt"
     local file = io.open(file_path, "r")
@@ -20,7 +21,8 @@ local function read_ascii()
     for entry in content:gmatch("[^%-]+") do
         local trimmed_entry = entry:gsub("^%s+", ""):gsub("%s+$", "")
         if trimmed_entry ~= "" then
-            table.insert(ascii_entries, trimmed_entry)
+            -- Preserve leading spaces by avoiding gsub on the entry itself
+            table.insert(ascii_entries, entry)
         end
     end
 
