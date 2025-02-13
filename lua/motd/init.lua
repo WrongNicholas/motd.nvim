@@ -54,8 +54,7 @@ local function read_quote()
     return "Error: No quotes found in quotes.txt"
 end
 
--- Function to show MOTD only when no file is provided
--- Function to show MOTD centered in the buffer
+-- Function to show MOTD centered both vertically and horizontally
 function M.show_motd()
     -- If Neovim was opened with files, don't show the MOTD
     if vim.fn.argc() > 0 then return end
@@ -71,10 +70,11 @@ function M.show_motd()
     table.insert(motd_ascii, "")  -- Add space between ASCII art and quote
     table.insert(motd_ascii, motd_quote)
 
-    -- Get the window width to center the content
+    -- Get window width and height
     local win_width = vim.o.columns
+    local win_height = vim.o.lines
 
-    -- Function to center a line
+    -- Function to center a line horizontally
     local function center_line(line)
         local line_length = #line
         if line_length < win_width then
@@ -85,14 +85,37 @@ function M.show_motd()
         end
     end
 
-    -- Center each line of the ASCII art and quote
+    -- Center each line horizontally
     for i, line in ipairs(motd_ascii) do
         motd_ascii[i] = center_line(line)
     end
 
+    -- Calculate vertical padding (lines above and below content)
+    local total_content_height = #motd_ascii
+    local padding_top = math.floor((win_height - total_content_height) / 2)
+    local padding_bottom = win_height - total_content_height - padding_top
+
+    -- Create padding before and after content
+    local padded_content = {}
+    
+    -- Add top padding
+    for i = 1, padding_top do
+        table.insert(padded_content, "")
+    end
+
+    -- Add centered content
+    for _, line in ipairs(motd_ascii) do
+        table.insert(padded_content, line)
+    end
+
+    -- Add bottom padding
+    for i = 1, padding_bottom do
+        table.insert(padded_content, "")
+    end
+
     -- Create a new buffer
     local buf = vim.api.nvim_create_buf(false, true) -- No file, temporary buffer
-    vim.api.nvim_buf_set_lines(buf, 0, -1, false, motd_ascii)
+    vim.api.nvim_buf_set_lines(buf, 0, -1, false, padded_content)
     vim.api.nvim_buf_set_option(buf, "modifiable", false) -- Read-only buffer
     vim.api.nvim_buf_set_option(buf, "buftype", "nofile") -- Prevent saving
     vim.api.nvim_buf_set_option(buf, "bufhidden", "wipe") -- Close automatically
