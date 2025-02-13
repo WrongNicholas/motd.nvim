@@ -55,6 +55,7 @@ local function read_quote()
 end
 
 -- Function to show MOTD only when no file is provided
+-- Function to show MOTD centered in the buffer
 function M.show_motd()
     -- If Neovim was opened with files, don't show the MOTD
     if vim.fn.argc() > 0 then return end
@@ -67,8 +68,27 @@ function M.show_motd()
     local motd_quote = read_quote()
 
     -- Combine ASCII art and quote
-    table.insert(motd_ascii, "")
+    table.insert(motd_ascii, "")  -- Add space between ASCII art and quote
     table.insert(motd_ascii, motd_quote)
+
+    -- Get the window width to center the content
+    local win_width = vim.o.columns
+
+    -- Function to center a line
+    local function center_line(line)
+        local line_length = #line
+        if line_length < win_width then
+            local spaces_to_add = math.floor((win_width - line_length) / 2)
+            return string.rep(" ", spaces_to_add) .. line
+        else
+            return line  -- No centering if line is wider than the window
+        end
+    end
+
+    -- Center each line of the ASCII art and quote
+    for i, line in ipairs(motd_ascii) do
+        motd_ascii[i] = center_line(line)
+    end
 
     -- Create a new buffer
     local buf = vim.api.nvim_create_buf(false, true) -- No file, temporary buffer
