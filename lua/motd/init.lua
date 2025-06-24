@@ -46,7 +46,7 @@ function M.show_motd()
     local motd_ascii = read_ascii()
 
     -- Combine ASCII art and quote
-    table.insert(motd_ascii)
+    table.insert(motd_ascii, "")
 
     -- Get window width and height
     local win_width = vim.o.columns
