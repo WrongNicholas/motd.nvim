@@ -34,26 +34,6 @@ local function read_ascii()
     return { "Error: No ASCII art found in ascii.txt" }
 end
 
--- Function to read a random quote from quotes.txt
-local function read_quote()
-    local file_path = get_plugin_path() .. "quotes.txt"
-    local file = io.open(file_path, "r")
-    if not file then return "Error: Could not read quotes.txt" end
-
-    local quotes = {}
-    for line in file:lines() do
-        if line ~= "" then table.insert(quotes, line) end
-    end
-    file:close()
-
-    -- Pick a random quote
-    if #quotes > 0 then
-        return quotes[math.random(#quotes)]
-    end
-
-    return "Error: No quotes found in quotes.txt"
-end
-
 -- Function to show MOTD centered both vertically and horizontally
 function M.show_motd()
     -- If Neovim was opened with files, don't show the MOTD
@@ -64,11 +44,9 @@ function M.show_motd()
 
     -- Read ASCII art and quote
     local motd_ascii = read_ascii()
-    local motd_quote = read_quote()
 
     -- Combine ASCII art and quote
-    table.insert(motd_ascii, "")  -- Add space between ASCII art and quote
-    table.insert(motd_ascii, motd_quote)
+    table.insert(motd_ascii)
 
     -- Get window width and height
     local win_width = vim.o.columns
@@ -97,7 +75,7 @@ function M.show_motd()
 
     -- Create padding before and after content
     local padded_content = {}
-    
+
     -- Add top padding
     for i = 1, padding_top do
         table.insert(padded_content, "")
